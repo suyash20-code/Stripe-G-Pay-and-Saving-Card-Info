@@ -1,79 +1,28 @@
-import {PlatformPay, PlatformPayButton, confirmPlatformPayPayment, usePlatformPay} from '@stripe/stripe-react-native';
-import React from 'react';
-import { Alert, View } from 'react-native';
-//npx eas build --profile development --platform android --message "stripe"
-function Home() {
-  const {
-    isPlatformPaySupported,
-    confirmPlatformPayPayment,
-  } = usePlatformPay();
+import { Stack, Link } from 'expo-router';
+import { View } from 'react-native';
 
+import { Button } from '~/components/Button';
+import { Container } from '~/components/Container';
+import { ScreenContent } from '~/components/ScreenContent';
 
-  // React.useEffect(() => {
-  //   (async function () {
-  //     if (!(await isPlatformPaySupported({ googlePay: {testEnv: true} }))) {
-  //       Alert.alert('Google Pay is not supported.');
-  //       return;
-  //     }
-  //   })();
-  // }, []);
-
-
-  const fetchPaymentIntentClientSecret = async () => {
-    // Fetch payment intent created on the server, see above
-    const response = await fetch(`https://619d-163-53-203-209.ngrok-free.app/pay`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        currency: 'usd',
-      }),
-    });
-    const { clientSecret } = await response.json();
-
-    return clientSecret;
-  };
-
-  const pay = async () => {
-    const clientSecret = await fetchPaymentIntentClientSecret();
-
-    const { error } = await confirmPlatformPayPayment(
-      clientSecret,
-      {
-        googlePay: {
-          testEnv: true,
-          merchantName: 'test-ecommerce',
-          merchantCountryCode: 'US',
-          currencyCode: 'USD',
-          billingAddressConfig: {
-            format: PlatformPay.BillingAddressFormat.Full,
-            isPhoneNumberRequired: true,
-            isRequired: true,
-          },
-        },
-      }
-    );
-
-    if (error) {
-      Alert.alert(error.code, error.message);
-      // Update UI to prompt user to retry payment (and possibly another payment method)
-      return;
-    }
-    Alert.alert('Success', 'The payment was confirmed successfully.');
-  };
-
+export default function Home() {
   return (
-    <View>
-      <PlatformPayButton
-        type={PlatformPay.ButtonType.Pay}
-        onPress={pay}
-        style={{
-          width: '100%',
-          height: 50,
-        }}
-      />
-    </View>
+    <>
+      <Stack.Screen options={{ title: 'Home' }} />
+    
+        <View style={{flex:1, justifyContent:'center'}}>
+        <Link href={{ pathname: '/gpay', params: { name: 'Dan' } }} asChild>
+          <Button title="G-Pay" />
+        </Link>
+        <View style={{marginTop:30}}>
+        <Link href={{ pathname: '/card', params: { name: 'Dan' } }} asChild>
+          <Button title="Card" />
+        </Link>
+        </View>
+       
+        </View>
+        
+     
+    </>
   );
 }
-export default Home
